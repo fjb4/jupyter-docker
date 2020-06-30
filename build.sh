@@ -1,1 +1,1 @@
-docker build . -t fjb4/jupyter
+docker image build . -t fjb4/tanzu-jupyter

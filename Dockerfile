@@ -46,6 +46,11 @@ RUN curl -sL -o /usr/local/bin/kubectx https://github.com/ahmetb/kubectx/release
 RUN curl -sL -o /usr/local/bin/hr https://raw.githubusercontent.com/LuRsT/hr/master/hr && \
     chmod +x /usr/local/bin/hr
 
+# Argo CD
+RUN ARGOCD_VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/') && \
+    curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$ARGOCD_VERSION/argocd-linux-amd64 && \
+    chmod +x /usr/local/bin/argocd
+
 # tmc (TODO: is there a URL that will always install the latest version?)
 RUN curl -sL -o /usr/local/bin/tmc https://vmware.bintray.com/tmc/0.1.0-1778aa17/linux/x64/tmc && \
     chmod +x /usr/local/bin/tmc

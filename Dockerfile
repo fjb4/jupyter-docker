@@ -11,6 +11,7 @@ RUN apt-get -qq update && \
     apt-get install -qq git && \
     apt-get install -qq curl && \
     apt-get install -qq wget && \
+    apt-get install -qq dnsutils && \
     apt-get install -qq jq
 
 # cf
@@ -18,6 +19,10 @@ RUN apt-key adv --fetch-keys https://packages.cloudfoundry.org/debian/cli.cloudf
     add-apt-repository -y "deb https://packages.cloudfoundry.org/debian stable main" && \
     apt-get -qq update && \
     apt-get install -qq cf-cli
+
+# bosh (TODO: rewrite this to always install the latest version)
+RUN curl -sL -o /usr/local/bin/bosh https://github.com/cloudfoundry/bosh-cli/releases/download/v6.3.1/bosh-cli-6.3.1-linux-amd64 && \
+    chmod +x /usr/local/bin/bosh
 
 # kubectl
 RUN apt-key adv --fetch-keys https://packages.cloud.google.com/apt/doc/apt-key.gpg && \
@@ -42,6 +47,9 @@ RUN curl -sL -o /usr/local/bin/kubectx https://github.com/ahmetb/kubectx/release
     curl -sL -o /usr/local/bin/kubens https://github.com/ahmetb/kubectx/releases/latest/download/kubens && \
     chmod +x /usr/local/bin/kubens
 
+# k14s (ytt, kbld, kapp, etc)
+RUN curl -L https://k14s.io/install.sh | bash
+
 # hr
 RUN curl -sL -o /usr/local/bin/hr https://raw.githubusercontent.com/LuRsT/hr/master/hr && \
     chmod +x /usr/local/bin/hr
@@ -51,13 +59,18 @@ RUN ARGOCD_VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-c
     curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$ARGOCD_VERSION/argocd-linux-amd64 && \
     chmod +x /usr/local/bin/argocd
 
-# tmc (TODO: is there a URL that will always install the latest version?)
-RUN curl -sL -o /usr/local/bin/tmc https://vmware.bintray.com/tmc/0.1.0-1778aa17/linux/x64/tmc && \
+# tmc (TODO: rewrite this to always install the latest version)
+RUN curl -sL -o /usr/local/bin/tmc https://vmware.bintray.com/tmc/0.1.0-2ee1a43e/linux/x64/tmc && \
     chmod +x /usr/local/bin/tmc
+
+ENV GEN_CERT yes
+ENV GRANT_SUDO yes
+ENV JUPYTER_ENABLE_LAB yes
+ENV RESTARTABLE yes
 
 # jupyter & bash_kernel
 RUN python3 -m pip install jupyter_nbextensions_configurator && \
     python3 -m pip install bash_kernel && \
     python3 -m bash_kernel.install --sys-prefix
 
-ENTRYPOINT ["jupyter", "lab", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.password=''"]
+ENTRYPOINT ["jupyter", "lab", "--allow-root", "--ip='*'", "--NotebookApp.token=''", "--NotebookApp.password=''"]

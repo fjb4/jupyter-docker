@@ -20,8 +20,9 @@ RUN apt-key adv --fetch-keys https://packages.cloudfoundry.org/debian/cli.cloudf
     apt-get -qq update && \
     apt-get install -qq cf-cli
 
-# bosh (TODO: rewrite this to always install the latest version)
-RUN curl -sL -o /usr/local/bin/bosh https://github.com/cloudfoundry/bosh-cli/releases/download/v6.3.1/bosh-cli-6.3.1-linux-amd64 && \
+# bosh
+RUN BOSH_URL=$(curl -s https://api.github.com/repos/cloudfoundry/bosh-cli/releases/latest | grep browser_download_url | grep linux | cut -d '"' -f 4) && \
+    curl -sL -o /usr/local/bin/bosh $BOSH_URL && \
     chmod +x /usr/local/bin/bosh
 
 # kubectl
